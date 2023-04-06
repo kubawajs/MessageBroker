@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  messagebroker.api:
+    container_name: API
+    image: ${DOCKER_REGISTRY-}messagebrokerapi
+    build:
+      context: .
+      dockerfile: MessageBroker.Api/Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - messagebroker.rabbitmq
+
+  messagebroker.rabbitmq:
+    container_name: RabbitMQ
+    image: rabbitmq:management
+    hostname: messagebroker-queue
+    volumes:
+    - ./.containers/queue/data/:/var/lib/rabbitmq
+    - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+    - 5672:5672
+    - 15672:15672
